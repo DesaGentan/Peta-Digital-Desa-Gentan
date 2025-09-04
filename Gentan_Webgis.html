@@ -1,0 +1,3752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+<title>WebGIS Gentan, Bulu, Sukoharjo</title>
+
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+ #map { height: 600px; width: 100%; }
+
+    /* Label styling */
+    .polygon-label {
+      font-size: 12px;
+      font-weight: bold;
+      color: black;
+      text-shadow: 1px 1px 2px white;
+    }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<!-- JS Leaflet -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Load GeoJSON RT/RW di sini -->
+  <script src="RT1RW1gentan.js"></script>
+  <!-- kalau ada RT lain, tinggal tambahin script-nya di sini -->
+<div style="position:absolute; bottom:10px; left:10px; z-index:1000;">
+  <img src="https://raw.githubusercontent.com/ArdiliaPutri/Peta-Digital/main/KKN_UII_71.png" 
+       alt="Logo Statistika UII" width="150">
+</div>
+</body>
+</html>
+
+
+
+
+<script>
+  // Inisialisasi peta (center di Gentan)
+  var map = L.map('map').setView([-7.772700025536981, 110.83686609662895], 14);
+
+  // --- Basemap ---
+  var basemapOSM = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+  });
+
+  var basemapEsri = L.tileLayer(
+      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles © Esri'
+  });
+
+  basemapOSM.addTo(map); // default OSM tampil pertama
+
+
+  // --- Marker ---
+  var marker = L.marker([-7.780572151120605, 110.84300739572141]).addTo(map)
+      .bindPopup('<b>Balai Desa Gentan</b><br><img src="https://nusantarapedia.net/wp-content/uploads/IMG_18042022_102238_700_x_525_piksel.jpg"alt="Balai Desa Gentan" width="300px"> <br> Alamat: Jl. Batu Seribu No.10, Kec. Bulu, Kab. Sukoharjo, Jawa Tengah</br> ');
+
+  var markerSendangLele = L.marker([-7.782089381635649, 110.84329596873556]).addTo(map)
+  .bindPopup(`
+    <div style="text-align:justify; max-width:250px;">
+      <b>Sendang Lele</b><br>
+      <img src="https://static.promediateknologi.id/crop/0x0:0x0/0x0/webp/photo/p2/230/2024/04/19/sendang-lele-ress-1321002123.jpg" 
+           alt="Sendang Lele" width="250px"><br>
+      Sendang Lele terletak di Baseng, Desa Gentan, Kecamatan Bulu, Kabupaten Sukoharjo. 
+      Sendang ini merupakan sumber air yang dihuni ikan lele berukuran besar, dengan panjang rata-rata hampir satu meter atau seukuran paha orang dewasa. 
+      Masyarakat setempat meyakini sendang ini memiliki nilai mistis. 
+      Konon, ikan lele di sini dianggap tidak biasa ada yang hanya terlihat berupa tulang atau kepala jika dipandang dengan mata tertentu. 
+      Selain itu, terdapat kepercayaan bahwa orang yang tidak menjaga sikap saat berada di hadapan lele-lele tersebut dapat mengalami kesurupan
+    </div>
+  `);
+
+
+  var markerEmbungGentan = L.marker([-7.7847281922239135, 110.83788842348315]).addTo(map)
+  .bindPopup(`
+    <div style="text-align:justify; max-width:250px; line-height:1.5;">
+      <b>Embung Gentan</b><br>
+      <img src="https://raw.githubusercontent.com/ArdiliaPutri/Peta-Digital/main/Embung_Pacinan.jpg" 
+           alt="Embung Gentan" width="250px"><br>
+      Embung Sebo Menggolo atau sering disebut Embung Gentan yang terletak di Pacinan, Gentan, Kecamatan Bulu, Kabupaten Sukoharjo, 
+      adalah destinasi wisata alam dengan tiket masuk gratis. 
+      Fasilitas yang tersedia termasuk Tim SAR untuk keamanan pengunjung dan penangkaran ikan yang menarik untuk dikunjungi. 
+      Tempat ini menawarkan suasana alami yang tenang, cocok untuk bersantai sambil menikmati keindahan sekitar.
+    </div>
+  `);
+
+  var markerBatuSeribu = L.marker([-7.78666222191999, 110.8386166230242]).addTo(map)
+      .bindPopup('<div style="text-align:justify; max-width:250px;"><b> Batu Seribu</b><br> <img src="https://tse4.mm.bing.net/th/id/OIP.6wMeuLT5lW1Inbnw9oP3bAHaE8?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Batu Seribu" width="250px"> <br> Batu Seribu yang terletak di Desa Gentan, Kecamatan Bulu, Kabupaten Sukoharjo, adalah destinasi wisata alam dengan tiket masuk terjangkau seharga Rp5.000. Tempat ini menawarkan fasilitas parkiran yang luas serta kolam renang yang bisa dinikmati dengan biaya tambahan Rp5.000. Batu Seribu menjadi pilihan yang menarik untuk rekreasi keluarga, dengan suasana alami yang segar dan kolam renang yang menyegarkan </div>');
+
+var markerPlatarOmbo = L.marker([-7.783473236884777, 110.84818674466814]).addTo(map)
+  .bindPopup(`
+    <div style="text-align:justify; max-width:250px;"> <b>Platar Ombo</b><br>
+    <img src="https://jatengtravelguide.info/images/1622779324.png" alt="Platar Ombo" width="250px"> <br> Platar Ombo terletak di Desa Gentan, Kecamatan Bulu, Kabupaten Sukoharjo. Tempat ini berupa puncak bukit batu yang dapat dicapai dengan pendakian singkat sekitar 5–10 menit. Dari puncak, pengunjung dapat menikmati panorama pedesaan, perbukitan, Gunung Sepikul di utara, Puncak Gajah Mungkur di selatan, serta Gunung Lawu di timur saat cuaca cerah. Platar Ombo juga menjadi spot favorit untuk melihat matahari terbit, hamparan persawahan, dan matahari terbenam. Fasilitas yang tersedia antara lain area berkemah dengan tarif parkir terjangkau, sementara tiket masuk belum diberlakukan </br>
+  `);
+
+  var markerMirikerep = L.marker([-7.78179520905591, 110.82935591502977]).addTo(map)
+      .bindPopup(`<div style="text-align:justify; max-width:250px;">
+    <b>Air Terjun Mirikerep</b><br>
+    <img src="https://lh5.googleusercontent.com/p/AF1QipPwsqNa23AjzV_UX_BqFnJMFFPIWwW_CJhGvPno=w800-h500-k-no" alt="Miri Kerep" width="250px"> <br> Air Terjun Mirikerep yang terletak di Gentan, Kecamatan Bulu, Kabupaten Sukoharjo, adalah destinasi wisata alam dengan tiket masuk gratis. Tempat ini menjadi ramai saat musim hujan karena mengandalkan air hujan untuk mengalir. Namun, selama musim kering, Air Terjun Mirikerep menawarkan keindahan alam yang menawan dan menjadi pilihan menarik bagi pecinta alam yang ingin merasakan suasana yang berbeda </br>
+  `);
+   // 🔹 Fungsi untuk bikin label di tengah polygon
+    function addLabelToPolygon(feature, layer) {
+      var center = layer.getBounds().getCenter();
+      var labelText = "RT " + feature.properties.rt + " / RW " + feature.properties.rw;
+
+      L.marker(center, {
+        icon: L.divIcon({
+          className: "polygon-label",
+          html: labelText,
+          iconSize: [100, 20],
+          iconAnchor: [50, 10]
+        }),
+        interactive: false
+      }).addTo(map);
+    }
+
+
+  // --- Polygon contoh batas wilayah (dummy GeoJSON) ---
+  var batasGentan = {
+    "type": "Feature",
+    "properties": {"name": "Desa Gentan"},
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [[
+        [110.850923895,-7.78309280699995,0],[110.850922387,-7.78309315799993,0],[110.850472754,-7.78319780099997,0],[110.850261502,-7.78341791199995,0],[110.849810339,-7.78347519299996,0],[110.849484013,-7.78337934499996,0],[110.84923,-7.78321000099993,0],[110.84885,-7.78349999999995,0],[110.84839,-7.78399999999993,0],[110.84806,-7.78448000099996,0],[110.8479,-7.78499999999997,0],[110.84765,-7.78576999999996,0],[110.847379999,-7.78635000099996,0],[110.84707,-7.78688000099993,0],[110.846929999,-7.78744999999998,0],[110.84673,-7.78785999999997,0],[110.84643,-7.78840999999994,0],[110.84597,-7.78922999999998,0],[110.84591,-7.78945999999996,0],[110.84556,-7.79060999999996,0],[110.845523837,-7.79063198099993,0],[110.84505,-7.79091999999997,0],[110.844239999,-7.79164999999995,0],[110.844189616,-7.79170619699994,0],[110.84398,-7.79193999999995,0],[110.84366,-7.79269000099993,0],[110.84333,-7.79325999999998,0],[110.843275128,-7.79333911699996,0],[110.8429,-7.79388000099993,0],[110.84257,-7.79425999999995,0],[110.84233,-7.79452999999995,0],[110.84209,-7.79473999999993,0],[110.84144,-7.79521999999997,0],[110.8414,-7.79546999999997,0],[110.84141,-7.79594999999995,0],[110.841374595,-7.79615737199993,0],[110.84134,-7.79635999999994,0],[110.84133,-7.79657000099996,0],[110.8413,-7.79682999999994,0],[110.84134,-7.79702999999995,0],[110.84152,-7.79735000099993,0],[110.84174,-7.79772000099996,0],[110.84173,-7.79791999999998,0],[110.84165,-7.79811999999993,0],[110.841634941,-7.79815764799997,0],[110.84159,-7.79826999999995,0],[110.84161,-7.79854999999998,0],[110.8417,-7.79891999999995,0],[110.8417,-7.79934000099996,0],[110.84172,-7.79956999999996,0],[110.84189,-7.79979999999995,0],[110.84191,-7.79999999999995,0],[110.841722008,-7.80040566699995,0],[110.841693502,-7.80037117299997,0],[110.84167174,-7.80034483999998,0],[110.841626621,-7.80029024399994,0],[110.841585382,-7.80024034199994,0],[110.841476996,-7.80010918899995,0],[110.841435574,-7.80007514599993,0],[110.841133794,-7.79982712299994,0],[110.841021003,-7.79973442399995,0],[110.841003515,-7.79972005099995,0],[110.840875128,-7.79968441799997,0],[110.84057925,-7.79960229799997,0],[110.840516645,-7.79959079799994,0],[110.840510876,-7.79958973799995,0],[110.840368338,-7.79956355399997,0],[110.840345302,-7.79955932199994,0],[110.840126936,-7.79951920899993,0],[110.840085816,-7.79951165599994,0],[110.839848511,-7.79947758799995,0],[110.839842336,-7.79947670199994,0],[110.839715699,-7.79945852199995,0],[110.839454064,-7.79942096099995,0],[110.839444952,-7.79942047599997,0],[110.839412155,-7.79941872999996,0],[110.839285623,-7.79941199199993,0],[110.838940765,-7.79939362899995,0],[110.838935859,-7.79938842499996,0],[110.838858889,-7.79930677699997,0],[110.838731982,-7.79917215599994,0],[110.838625142,-7.79905882099996,0],[110.838573307,-7.79885482499998,0],[110.83841826,-7.79824463799997,0],[110.838417445,-7.79824330499997,0],[110.838163892,-7.79782844299996,0],[110.838143823,-7.79781280899994,0],[110.837838603,-7.79757504199995,0],[110.837795926,-7.79755230599994,0],[110.837453268,-7.79736976099997,0],[110.837396813,-7.79733968599993,0],[110.837376706,-7.79733433699994,0],[110.837127693,-7.79726809699997,0],[110.836761497,-7.79717068499997,0],[110.836749791,-7.79716757099993,0],[110.836588155,-7.79716333199997,0],[110.836399748,-7.79715838999994,0],[110.835927499,-7.79726675499995,0],[110.835451898,-7.79723517699995,0],[110.835379344,-7.79723035999996,0],[110.835363934,-7.79722295199997,0],[110.834965154,-7.79703125199995,0],[110.834965035,-7.79703119499993,0],[110.834964824,-7.79703096199995,0],[110.834515318,-7.79653431899993,0],[110.834450644,-7.79646286299993,0],[110.834432687,-7.79644302299994,0],[110.834418359,-7.79642909699993,0],[110.834032343,-7.79605390499995,0],[110.833864204,-7.79589027099996,0],[110.833725498,-7.79575527999998,0],[110.833615999,-7.79568868799993,0],[110.833412943,-7.79556519899995,0],[110.832841337,-7.79534787999995,0],[110.832430052,-7.79539294499995,0],[110.832419935,-7.79539348399993,0],[110.832029442,-7.79541428199997,0],[110.831760065,-7.79542862999995,0],[110.83178,-7.79501000099998,0],[110.83177,-7.79490999999996,0],[110.83175,-7.79483999999997,0],[110.8318,-7.79471999999993,0],[110.83202,-7.79415000099993,0],[110.832069999,-7.79402999999996,0],[110.83221,-7.79378999999994,0],[110.832221291,-7.79376967599995,0],[110.83226,-7.79369999999994,0],[110.83244,-7.79339999999996,0],[110.83265,-7.79304999999994,0],[110.83282,-7.79279999999994,0],[110.832921878,-7.79258654099993,0],[110.832982267,-7.79246001199994,0],[110.83303,-7.79235999999997,0],[110.83322,-7.79202999999995,0],[110.83336,-7.79179999999997,0],[110.83353,-7.79161999999997,0],[110.833761052,-7.79145115399996,0],[110.83379,-7.79142999999993,0],[110.83394,-7.79127999999997,0],[110.83411,-7.79101999999995,0],[110.83442,-7.79079999999993,0],[110.83471,-7.79064999999997,0],[110.83501,-7.79057999999998,0],[110.83526,-7.79054999999994,0],[110.83538,-7.79046999999997,0],[110.83546,-7.79035000099998,0],[110.83545,-7.79018999999994,0],[110.83529,-7.79000999999994,0],[110.834757121,-7.78980787399996,0],[110.83355,-7.78934999999996,0],[110.8328,-7.78904999999997,0],[110.832725388,-7.78903109899994,0],[110.83205,-7.78885999999994,0],[110.83186,-7.78881999999993,0],[110.83167,-7.78877999999997,0],[110.831353893,-7.78851306499996,0],[110.83122,-7.78840000099996,0],[110.830586575,-7.78776657499998,0],[110.830549999,-7.78772999999995,0],[110.8295,-7.78665999999993,0],[110.82942,-7.78657999999996,0],[110.82928,-7.78647999999993,0],[110.82915,-7.78633000099995,0],[110.82889,-7.78596999999996,0],[110.82875,-7.78571999999997,0],[110.828593423,-7.78552427899996,0],[110.82839,-7.78526999999997,0],[110.82823,-7.78493999999995,0],[110.82799,-7.78454999999997,0],[110.827905808,-7.78449143199998,0],[110.827759999,-7.78438999999997,0],[110.8276,-7.78430999999995,0],[110.82734,-7.78419999999994,0],[110.82717,-7.78409999999997,0],[110.82712,-7.78403999999995,0],[110.82711,-7.78388999999993,0],[110.82711,-7.78374999999994,0],[110.82713,-7.78348999999997,0],[110.82714,-7.78314999999998,0],[110.82736,-7.78321999999997,0],[110.82784,-7.78335000099997,0],[110.82825,-7.78284999999994,0],[110.82861,-7.78236999999996,0],[110.828804959,-7.78209922399998,0],[110.829082526,-7.78171371399998,0],[110.82915,-7.78161999999998,0],[110.82967,-7.78101000099997,0],[110.829787655,-7.78086172299993,0],[110.829849694,-7.78078353599994,0],[110.830056085,-7.78052342799998,0],[110.8304,-7.78009000099996,0],[110.830538054,-7.77988460299997,0],[110.830715176,-7.77962107999997,0],[110.83081,-7.77947999999998,0],[110.830808828,-7.77938390899993,0],[110.830807067,-7.77923947099993,0],[110.830805318,-7.77909610299997,0],[110.830801416,-7.77877612199995,0],[110.8308,-7.77865999999995,0],[110.83081476,-7.77864155199995,0],[110.831100662,-7.77828417399996,0],[110.83116,-7.77820999999994,0],[110.83109,-7.77810000099993,0],[110.83105211,-7.77791055299997,0],[110.83105,-7.77789999999993,0],[110.83103,-7.77777999999995,0],[110.831075059,-7.77768487499998,0],[110.83112,-7.77758999999998,0],[110.831189093,-7.77739135799993,0],[110.8312,-7.77736000099998,0],[110.83125,-7.77726999999993,0],[110.83128,-7.77724999999998,0],[110.83132,-7.77721999999994,0],[110.831484078,-7.77699575999998,0],[110.83162,-7.77680999999995,0],[110.83169,-7.77668999999997,0],[110.831679999,-7.77647999999994,0],[110.83227,-7.77648999999997,0],[110.832294708,-7.77640756199997,0],[110.832317174,-7.77542738499994,0],[110.832343342,-7.77479268599996,0],[110.832591945,-7.77479661399997,0],[110.83317,-7.77484999999996,0],[110.83336,-7.77480999999995,0],[110.83348,-7.77455999999995,0],[110.833599616,-7.77396191899993,0],[110.83361,-7.77391000099993,0],[110.833717128,-7.77332491299995,0],[110.833724076,-7.77328696699993,0],[110.83374,-7.77319999999997,0],[110.83377,-7.77285999999998,0],[110.833768728,-7.77285618499997,0],[110.83372,-7.77270999999996,0],[110.833689999,-7.77246999999994,0],[110.83377,-7.77227999999997,0],[110.834039999,-7.77211999999997,0],[110.8343,-7.77204999999998,0],[110.83448,-7.77196000099997,0],[110.83446,-7.77169999999995,0],[110.83428,-7.77101999999996,0],[110.83422,-7.77065999999996,0],[110.834169486,-7.77061260099993,0],[110.834306376,-7.77032904599997,0],[110.833712596,-7.77000571399998,0],[110.833649999,-7.77003000099995,0],[110.834018703,-7.76961093599994,0],[110.834184342,-7.76944586099995,0],[110.834764164,-7.76864192999994,0],[110.835340394,-7.76781645699998,0],[110.835524078,-7.76752573999994,0],[110.835758163,-7.76720632099995,0],[110.835838923,-7.76716060899997,0],[110.83584,-7.76716000099998,0],[110.837362127,-7.76826322899996,0],[110.839247919,-7.76962745499998,0],[110.839458572,-7.76978713699998,0],[110.839753536,-7.77010515299997,0],[110.840190242,-7.77035582899993,0],[110.840584625,-7.77066411599998,0],[110.840722799,-7.77078191999993,0],[110.840925753,-7.77092559499994,0],[110.84110279,-7.77107524399997,0],[110.841306222,-7.77122657799993,0],[110.841749552,-7.77155223599993,0],[110.842192889,-7.77186257599993,0],[110.842689985,-7.77215378899996,0],[110.843219312,-7.77256599499998,0],[110.84337,-7.77276000099994,0],[110.843566712,-7.77274992999997,0],[110.843725324,-7.77274285099998,0],[110.843872352,-7.77273304799996,0],[110.84395808,-7.77272999899998,0],[110.844425194,-7.77272116699993,0],[110.844546133,-7.77272695499994,0],[110.844726588,-7.77272319199994,0],[110.84685,-7.77270999999996,0],[110.84666445,-7.77310021399995,0],[110.846570605,-7.77329963399995,0],[110.84604808,-7.77440999899994,0],[110.846019756,-7.77447473899997,0],[110.84597808,-7.77457000099997,0],[110.845799905,-7.77497725799998,0],[110.84569808,-7.77520999899997,0],[110.845684199,-7.77524013299995,0],[110.84529,-7.77609999999993,0],[110.84543808,-7.77634999899993,0],[110.845564266,-7.77659266699993,0],[110.84569808,-7.77684999999997,0],[110.845967418,-7.77730210299995,0],[110.84598,-7.77732000099996,0],[110.84589205,-7.77744516699994,0],[110.845948495,-7.77759612699998,0],[110.846060845,-7.77783581899996,0],[110.845909039,-7.77823784299994,0],[110.845853119,-7.77848630399995,0],[110.84583,-7.77871999999996,0],[110.846208275,-7.77890640699997,0],[110.846453919,-7.77913434099997,0],[110.846862703,-7.77946955299996,0],[110.84721963,-7.77987176099998,0],[110.847371233,-7.78002881699996,0],[110.847847203,-7.78037937099998,0],[110.84792204,-7.78047130099998,0],[110.847924376,-7.78079814799997,0],[110.847943021,-7.78085041199995,0],[110.848075473,-7.78088109499993,0],[110.848139999,-7.78101000099997,0],[110.84836808,-7.78084999999993,0],[110.848608079,-7.78112999899997,0],[110.84896,-7.78141999999997,0],[110.849589516,-7.78200350299994,0],[110.850069284,-7.78248532999993,0],[110.850462141,-7.78274873599997,0],[110.850923895,-7.78309280699995,0]
+
+      ]]
+
+    }
+  };
+
+  var batasgentanlayer = L.geoJSON(batasGentan, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "yellow",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <div style="max-height:300px; overflow-y:auto;">
+        <b>Informasi Desa Gentan</b><br>
+        <table border="1" cellspacing="0" cellpadding="5" style="border-collapse:collapse; width:100%;">
+          <tr>
+            <td><b>Nama Desa</b></td>
+            <td>Gentan</td>
+          </tr>
+          <tr>
+            <td><b>Kecamatan</b></td>
+            <td>Bulu</td>
+          </tr>
+          <tr>
+            <td><b>Kabupaten</b></td>
+            <td>Sukoharjo</td>
+          </tr>
+          <tr>
+            <td><b>Luas Wilayah</b></td>
+            <td>± 457.713 Ha</td>
+          </tr>
+          <tr>
+            <td><b>Jumlah Penduduk</b></td>
+            <td>± 3326 Jiwa</td>
+          </tr>
+          <tr>
+            <td><b>Data Dukuh</b></td>
+            <td>
+              <table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse; width:100%; text-align:center; font-size:11px;">
+                <tr><th>Dukuh</th><th>Penduduk</th><th>Detail RT/RW</th></tr>
+                
+                <tr>
+                  <td>Dukuh Gentan</td><td>644</td>
+                  <td>
+                    <table border="1" cellspacing="0" cellpadding="3" 
+                           style="border-collapse:collapse; width:100%; text-align:center;">
+                      <tr><th>RW</th><th>RT</th><th>Penduduk</th></tr>
+                      <tr><td rowspan="2">01</td><td>01</td><td>140</td></tr>
+                      <tr><td>02</td><td>74</td></tr>
+                      <tr><td rowspan="2">02</td><td>01</td><td>108</td></tr>
+                      <tr><td>02</td><td>141</td></tr>
+                      <tr><td rowspan="2">03</td><td>01</td><td>115</td></tr>
+                      <tr><td>02</td><td>66</td></tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td>Dukuh Baseng</td><td>1538</td>
+                  <td>
+                    <table border="1" cellspacing="0" cellpadding="3" 
+                           style="border-collapse:collapse; width:100%; text-align:center;">
+                      <tr><th>RW</th><th>RT</th><th>Penduduk</th></tr>
+                      <tr><td rowspan="2">04</td><td>01</td><td>328</td></tr>
+                      <tr><td>02</td><td>167</td></tr>
+                      <tr><td rowspan="3">05</td><td>01</td><td>248</td></tr>
+                      <tr><td>02</td><td>252</td></tr>
+                      <tr><td>03</td><td>215</td></tr>
+                      <tr><td rowspan="2">06</td><td>01</td><td>150</td></tr>
+                      <tr><td>02</td><td>178</td></tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td>Dukuh Bodeh</td><td>1144</td>
+                  <td>
+                    <table border="1" cellspacing="0" cellpadding="3" 
+                           style="border-collapse:collapse; width:100%; text-align:center;">
+                      <tr><th>RW</th><th>RT</th><th>Penduduk</th></tr>
+                      <tr><td rowspan="2">07</td><td>01</td><td>256</td></tr>
+                      <tr><td>02</td><td>125</td></tr>
+                      <tr><td rowspan="3">08</td><td>01</td><td>149</td></tr>
+                      <tr><td>02</td><td>231</td></tr>
+                      <tr><td>03</td><td>65</td></tr>
+                      <tr><td rowspan="4">09</td><td>01</td><td>97</td></tr>
+                      <tr><td>02</td><td>72</td></tr>
+                      <tr><td>03</td><td>91</td></tr>
+                      <tr><td>04</td><td>58</td></tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `, { maxWidth: 450 }); // atur max lebar popup
+  }
+}).addTo(map);
+
+
+
+//Gentan RW 1//
+var RT1RW1gentan = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "01",
+        "nama": "RT 01 / RW 01"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.83583698872104, -7.767161524534544],
+          [110.83576200194763, -7.767205766122761],
+          [110.83551816077883, -7.7675304899345665],
+          [110.83536322092812, -7.767791199094109],
+          [110.83475536287864, -7.768652148159653],
+          [110.83419134865184, -7.7694355205591386],
+          [110.8336483335894, -7.770031635358421],
+          [110.83371153194489, -7.770006783625355],
+          [110.83430616330378, -7.770327097504577],
+          [110.83422027914511, -7.770503668338108],
+          [110.83416912474785, -7.770612472488722],
+          [110.83422093421089, -7.77065707588477],
+          [110.83427734113059, -7.7710159468232405],
+          [110.83437960477406, -7.771406276960533],
+          [110.8344620623429, -7.771699729074129],
+          [110.83446794586331, -7.771786261085197],
+          [110.83448162945544, -7.771951474628146],
+          [110.83461098760603, -7.772400593837517],
+          [110.83554043982235, -7.772120375911783],
+          [110.83776704847668, -7.76855795463517],
+          [110.83583698872104, -7.767161524534544]
+        ]]
+      }
+    }
+  ]
+};
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW1gentan, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW1gentan, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "green",
+    fillOpacity: 0.1
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Gentan RT 01/RW 01</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>69 Jiwa</td>
+          <td>71 Jiwa</td>
+        </tr>
+      </table>
+    `);
+  }
+}).addTo(map);
+// 🔹 Contoh untuk polygon RT 01 / RW 01
+    var rt1rw1Layer = L.geoJSON(RT1RW1gentan, {
+      style: {
+        color: "red",
+        weight: 2,
+        fillColor: "green",
+        fillOpacity: 0.3
+      },
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(`
+          <b>Informasi Dusun Gentan RT ${feature.properties.rt}/RW ${feature.properties.rw}</b><br>
+          <table border="1" cellspacing="0" cellpadding="5">
+            <tr>
+              <td><b>Jenis Kelamin</b></td>
+              <td> Perempuan </td>
+              <td> Laki-laki </td>
+            </tr>
+            <tr>
+              <td><b>Jumlah Penduduk</b></td>
+              <td>69 Jiwa</td>
+              <td>71 Jiwa</td>
+            </tr>
+          </table>
+        `);
+
+        // 🔹 Tambahin label otomatis
+        addLabelToPolygon(feature, layer);
+      }
+    }).addTo(map);
+
+var RT2RW1gentan = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "01",
+        "nama": "RT 02 / RW 01"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.83776740847526, -7.768564291456087],
+          [110.83553333828979, -7.772130409045118],
+          [110.83712783507019, -7.773403795764466],
+          [110.838903537666, -7.76938605769999],
+          [110.83776740847526, -7.768564291456087]
+        ]]
+      }
+    }
+  ]
+};
+
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW1gentan, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT2RW1gentan, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "green",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Gentan RT 02/RW 01</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>38 Jiwa</td>
+          <td>36 Jiwa</td>
+        </tr>
+      </table>
+    `);
+     // 🔹 Tambahin label otomatis
+    addLabelToPolygon(feature, layer);
+  }
+}).addTo(map);
+
+
+
+//Gentan RW 2//
+var RT1RW2gentan = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "02",
+        "nama": "RT 01 / RW 02"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.83891104903353, -7.769387727061712],
+          [110.83654352026554, -7.7747105643664725],
+          [110.83809464116939, -7.7754356356154375],
+          [110.84055800595962, -7.770644508690509],
+          [110.84018797089895, -7.77034685214114],
+          [110.83975707749838, -7.770099445202408],
+          [110.83961310457452, -7.769939652491805],
+          [110.8394648637352, -7.769792545980316],
+          [110.83891104903353, -7.769387727061712]
+        ]]
+      }
+    }
+  ]
+};
+
+
+
+ // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW2gentan, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW2gentan, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "green",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+       <b>Informasi Dusun Gentan RT 01/RW 02</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>63 Jiwa</td>
+          <td>45 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+var RT2RW2Gentan = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "02",
+        "nama": "RT 02 / RW 02"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.84056005011843, -7.770646242587574],
+          [110.83868932238857, -7.774297663956872],
+          [110.8377934919659, -7.776047493430866],
+          [110.83883451273033, -7.776874960973444],
+          [110.84058559954315, -7.776832644355409],
+          [110.84054289010766, -7.775266926476434],
+          [110.84126895049337, -7.775436193555876],
+          [110.8426975610912, -7.772154885029735],
+          [110.8422056615362, -7.771875556375214],
+          [110.84193228322488, -7.7716737741343955],
+          [110.84162755801574, -7.771471991893577],
+          [110.84110692718012, -7.771079469125503],
+          [110.84092286094528, -7.770922513129291],
+          [110.84082692709276, -7.7708558101260685],
+          [110.84072639084643, -7.77078377714262],
+          [110.84056005011843, -7.770646242587574]
+        ]]
+      }
+    }
+  ]
+};
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW2Gentan, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT2RW2Gentan, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "green",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Gentan RT 2/RW 2</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>74 Jiwa</td>
+          <td>67 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+var RT1RW3Gentan = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "03",
+        "nama": "RT 01 / RW 03"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.8388321145307, -7.776861549255415],
+          [110.83900771860851, -7.778881809183801],
+          [110.84258640355074, -7.778911332916124],
+          [110.84257617412209, -7.775679575871052],
+          [110.840561939299, -7.7752890925203815],
+          [110.84059960257389, -7.776842756359912],
+          [110.8388321145307, -7.776861549255415]
+        ]]
+      }
+    }
+  ]
+};
+
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW3Gentan, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW3Gentan, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "green",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Gentan RT 1/RW 3</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>57 Jiwa</td>
+          <td>58 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+
+var RT2RW3Gentan = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "03",
+        "nama": "RT 02 / RW 03"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.84375231411371, -7.7795461807571655],
+          [110.84259223547838, -7.778915407097031],
+          [110.83970211839119, -7.778881149229221],
+          [110.83957600269815, -7.781243324897858],
+          [110.84049357317934, -7.781806525175853],
+          [110.84080537234172, -7.7818647657433075],
+          [110.84157700644664, -7.7820980088993394],
+          [110.84171945266127, -7.782094056670516],
+          [110.84182358907111, -7.781929046969154],
+          [110.84193769643701, -7.781863040839781],
+          [110.84211670232162, -7.781911219274221],
+          [110.84268095615482, -7.7820095055074745],
+          [110.84291265092673, -7.782163554455465],
+          [110.8430974997454, -7.7823362764717245],
+          [110.84313754175037, -7.782227856751035],
+          [110.84332182606374, -7.781048305280478],
+          [110.84304360561867, -7.780898827472896],
+          [110.84375231411371, -7.7795461807571655]
+        ]]
+      }
+    }
+  ]
+};
+
+
+   // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW3Gentan, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT2RW3Gentan, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "green",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Gentan RT 1/RW 3</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>29 Jiwa</td>
+          <td>37 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+// baseng //
+//Baseng RW 4//
+var RT1RW4baseng = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "04",
+        "nama": "RT 01 / RW 04"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+           [110.84304611749678,
+              -7.780897227006534
+            ],
+            [
+              110.84332232584092,
+              -7.781054539465785
+            ],
+            [
+              110.84314114627693,
+              -7.782207911581764
+            ],
+            [
+              110.84325155068319,
+              -7.7822755810016275
+            ],
+            [
+              110.84324763924732,
+              -7.782315157789263
+            ],
+            [
+              110.84331275811746,
+              -7.782348609694083
+            ],
+            [
+              110.8436150018432,
+              -7.782508173129415
+            ],
+            [
+              110.84404062014784,
+              -7.782695806044529
+            ],
+            [
+              110.84413997259489,
+              -7.782447381502756
+            ],
+            [
+              110.8442119084691,
+              -7.782233364755157
+            ],
+            [
+              110.84434528953565,
+              -7.78184689136657
+            ],
+            [
+              110.84448075519964,
+              -7.781463443662346
+            ],
+            [
+              110.84452787954011,
+              -7.78134116492863
+            ],
+            [
+              110.84457725513053,
+              -7.7812149827801065
+            ],
+            [
+              110.84467600631126,
+              -7.780967079523222
+            ],
+            [
+              110.84469418707815,
+              -7.780901830138546
+            ],
+            [
+              110.84471912159643,
+              -7.780817621306838
+            ],
+            [
+              110.84476786500971,
+              -7.780650318904989
+            ],
+            [
+              110.84501249639885,
+              -7.779803929248132
+            ],
+            [
+              110.84375308206268,
+              -7.779545085559718
+            ],
+            [
+              110.84304611749678,
+              -7.780897227006534]
+        ]]
+      }
+    }
+  ]
+};
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW4baseng, {
+    style: function(feature) {
+      return {
+        color: "red",
+        weight: 2,
+        fillColor: "pink",
+        fillOpacity: 0.5
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW4baseng, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "pink",
+    fillOpacity: 0.5
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Baseng RT 01/RW 04</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>156 Jiwa</td>
+          <td>172 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+var RT2RW4baseng = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "04",
+        "nama": "RT 02 / RW 04"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.84501714093506,
+              -7.7797993080413335
+            ],
+            [
+              110.84467394437604,
+              -7.780977002823306
+            ],
+            [
+              110.84448978925468,
+              -7.7814414451246705
+            ],
+            [
+              110.84423029794772,
+              -7.78217957558013
+            ],
+            [
+              110.84549852462277,
+              -7.7824837036367995
+            ],
+            [
+              110.84555508305192,
+              -7.7821740835808555
+            ],
+            [
+              110.8456109401705,
+              -7.781857515018032
+            ],
+            [
+              110.845677716705,
+              -7.781707566357937
+            ],
+            [
+              110.84572741867598,
+              -7.781539572550656
+            ],
+            [
+              110.84583365244328,
+              -7.781212607507001
+            ],
+            [
+              110.84586284920967,
+              -7.7811333952274495
+            ],
+            [
+              110.84589090767216,
+              -7.781055310769133
+            ],
+            [
+              110.84594702459384,
+              -7.780901397499576
+            ],
+            [
+              110.84595631146384,
+              -7.780875710560717
+            ],
+            [
+              110.84596332172654,
+              -7.780821264113703
+            ],
+            [
+              110.8459762039467,
+              -7.780727032926944
+            ],
+            [
+              110.84599855347417,
+              -7.780558871385544
+            ],
+            [
+              110.84604552913646,
+              -7.780223676126596
+            ],
+            [
+              110.84533522705357,
+              -7.779774427119179
+            ],
+            [
+              110.84501714093506,
+              -7.7797993080413335] 
+        ]]
+      }
+    }
+  ]
+};
+
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW4baseng, {
+    style: function(feature) {
+      return {
+        color: "red",
+        weight: 2,
+        fillColor: "pink",
+        fillOpacity: 0.5
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT2RW4baseng, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "pink",
+    fillOpacity: 0.5
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Baseng RT 02/RW 04</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>77 Jiwa</td>
+          <td>90 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+  // Baseng RW 5//
+  var RT1RW5baseng = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "05",
+        "nama": "RT 01 / RW 05"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.8460447791071,
+              -7.780219751431332
+            ],
+            [
+              110.84595531048313,
+              -7.780875724160168
+            ],
+            [
+              110.84587508929945,
+              -7.781098882597462
+            ],
+            [
+              110.84583426855681,
+              -7.781211165427898
+            ],
+            [
+              110.84579841886756,
+              -7.7813213374247
+            ],
+            [
+              110.84571070102612,
+              -7.781590920066243
+            ],
+            [
+              110.8456771042529,
+              -7.781704656455442
+            ],
+            [
+              110.84561273396014,
+              -7.781854200323366
+            ],
+            [
+              110.8473510210224,
+              -7.782719533901059
+            ],
+            [
+              110.84744048964808,
+              -7.78246246476057
+            ],
+            [
+              110.84778047042107,
+              -7.782143344227734
+            ],
+            [
+              110.84821886668033,
+              -7.781771036633856
+            ],
+            [
+              110.84784309845833,
+              -7.781673527447126
+            ],
+            [
+              110.84651001595302,
+              -7.781168252207962
+            ],
+            [
+              110.84654580340356,
+              -7.780450228452409
+            ],
+            [
+              110.8460447791071,
+              -7.780219751431332] 
+        ]]
+      }
+    }
+  ]
+};
+
+
+ // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW5baseng, {
+    style: function(feature) {
+      return {
+        color: "red",
+        weight: 2,
+        fillColor: "pink",
+        fillOpacity: 0.5
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW5baseng, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "pink",
+    fillOpacity: 0.5
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Baseng RT 01/RW 05</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>124 Jiwa</td>
+          <td>124 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+
+   var RT2RW5baseng = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "05",
+        "nama": "RT 02 / RW 05"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+           [110.84426651311895,
+              -7.783523738114468
+            ],
+            [
+              110.84478681512755,
+              -7.783693082812235
+            ],
+            [
+              110.84533820444778,
+              -7.783874405623266
+            ],
+            [
+              110.84541655836338,
+              -7.783175845475867
+            ],
+            [
+              110.84545666578173,
+              -7.78282840918137
+            ],
+            [
+              110.84549863412275,
+              -7.782484660454173
+            ],
+            [
+              110.84519038658838,
+              -7.782410754534251
+            ],
+            [
+              110.8448583534338,
+              -7.782329437388874
+            ],
+            [
+              110.84423010427508,
+              -7.782180603697739
+            ],
+            [
+              110.84414171412212,
+              -7.78244285159397
+            ],
+            [
+              110.84404102271407,
+              -7.782696393810866
+            ],
+            [
+              110.84361242922802,
+              -7.782506652618579
+            ],
+            [
+              110.84324737790172,
+              -7.782315170205294
+            ],
+            [
+              110.84298969461366,
+              -7.783868302817169
+            ],
+            [
+              110.84358021881573,
+              -7.784037655553725
+            ],
+            [
+              110.84419408038957,
+              -7.784208429477772
+            ],
+            [
+              110.84420246562625,
+              -7.784142697713294
+            ],
+            [
+              110.84421196797044,
+              -7.784039248455134
+            ],
+            [
+              110.84423097265892,
+              -7.783869042455528
+            ],
+            [
+              110.84426651311895,
+              -7.783523738114468] 
+        ]]
+      }
+    }
+  ]
+};
+
+// --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW5baseng, {
+    style: function(feature) {
+      return {
+        color: "red",
+        weight: 2,
+        fillColor: "pink",
+        fillOpacity: 0.5
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+  
+  var polygonLayer = L.geoJSON(RT2RW5baseng, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "pink",
+    fillOpacity: 0.5
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Baseng RT 02/RW 05</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td> 111 Jiwa </td>
+          <td> 141 Jiwa </td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+ var RT3RW5baseng = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "03",
+        "rw": "05",
+        "nama": "RT 03 / RW 05"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.84561346381912,
+              -7.781851893466921
+            ],
+            [
+              110.845580957539,
+              -7.782032456312066
+            ],
+            [
+              110.8454961012244,
+              -7.78248593123989
+            ],
+            [
+              110.84545690504245,
+              -7.782846389637815
+            ],
+            [
+              110.84540883659196,
+              -7.78322819890078
+            ],
+            [
+              110.84533966418002,
+              -7.783874509526171
+            ],
+            [
+              110.8442655864551,
+              -7.783527295595491
+            ],
+            [
+              110.84423014255651,
+              -7.78386518243758
+            ],
+            [
+              110.84419485835798,
+              -7.784212077294342
+            ],
+            [
+              110.84417963033275,
+              -7.784206517805927
+            ],
+            [
+              110.84409802092273,
+              -7.784615131282905
+            ],
+            [
+              110.84425960584744,
+              -7.784859244388265
+            ],
+            [
+              110.8444120311654,
+              -7.785085614586137
+            ],
+            [
+              110.84648061136363,
+              -7.785530663418712
+            ],
+            [
+              110.84735127574919,
+              -7.782719585933776
+            ],
+            [
+              110.84733809396451,
+              -7.782714792029312
+            ],
+            [
+              110.84730562806675,
+              -7.782697856880365
+            ],
+            [
+              110.84721770209978,
+              -7.782653830469279
+            ],
+            [
+              110.84703691221866,
+              -7.7825650947106055
+            ],
+            [
+              110.84667815741378,
+              -7.782389730802208
+            ],
+            [
+              110.84561346381912,
+              -7.781851893466921]
+        ]]
+      }
+    }
+  ]
+};
+
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT3RW5baseng, {
+    style: function(feature) {
+      return {
+        color: "red",
+        weight: 2,
+        fillColor: "pink",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT3RW5baseng, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "pink",
+    fillOpacity: 0.5
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Baseng RT 03/RW 05</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>114 Jiwa</td>
+          <td>101 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+  //Baseng RW 6//
+ var RT1RW6baseng = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "06",
+        "nama": "RT 01 / RW 06"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.84297678353147,
+              -7.783868132889779
+            ],
+            [
+              110.84300098268886,
+              -7.784299704010735
+            ],
+            [
+              110.84335590364913,
+              -7.78574626322974
+            ],
+            [
+              110.84343656836234,
+              -7.7860499598848065
+            ],
+            [
+              110.84355756414465,
+              -7.787224785222136
+            ],
+            [
+              110.84505791184478,
+              -7.787296713196753
+            ],
+            [
+              110.8452434387109,
+              -7.785506502151591
+            ],
+            [
+              110.84472719004032,
+              -7.785330677439745
+            ],
+            [
+              110.84445293293294,
+              -7.785146860616976
+            ],
+            [
+              110.84409801197268,
+              -7.784619385809108
+            ],
+            [
+              110.84417867582698,
+              -7.784203799128292
+            ],
+            [
+              110.84297678353147,
+              -7.783868132889779]
+        ]]
+      }
+    }
+  ]
+};
+
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW6baseng, {
+    style: function(feature) {
+      return {
+        color: "red",
+        weight: 2,
+        fillColor: "pink",
+        fillOpacity: 0.5
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW6baseng, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "pink",
+    fillOpacity: 0.5
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Baseng RT 01/RW 06</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>77 Jiwa</td>
+          <td>73 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+ var RT2RW6baseng = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "06",
+        "nama": "RT 02 / RW 06"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [110.8429112614437,
+              -7.782162848347866
+            ],
+            [
+              110.84268135976703,
+              -7.782010010346042
+            ],
+            [
+              110.8423626022718,
+              -7.781954032808528
+            ],
+            [
+              110.84220339116396,
+              -7.78192670841522
+            ],
+            [
+              110.8421164095352,
+              -7.7819112191814845
+            ],
+            [
+              110.84204267131241,
+              -7.781891743687581
+            ],
+            [
+              110.8420957688462,
+              -7.782528186527188
+            ],
+            [
+              110.84191274109116,
+              -7.783370892247731
+            ],
+            [
+              110.8415574519193,
+              -7.784490941532809
+            ],
+            [
+              110.84106219717313,
+              -7.7856963206481
+            ],
+            [
+              110.84105143083286,
+              -7.7861016699146575
+            ],
+            [
+              110.84127752394312,
+              -7.786283010248582
+            ],
+            [
+              110.84176200917858,
+              -7.786464350505
+            ],
+            [
+              110.84245105484558,
+              -7.786485684647104
+            ],
+            [
+              110.84304320346604,
+              -7.786411015143116
+            ],
+            [
+              110.843465922588,
+              -7.786336345625784
+            ],
+            [
+              110.8434361732451,
+              -7.786051840985849
+            ],
+            [
+              110.84340481217598,
+              -7.785933547643889
+            ],
+            [
+              110.8433785504534,
+              -7.785834200552479
+            ],
+            [
+              110.84332857668124,
+              -7.785636348427801
+            ],
+            [
+              110.84323202869956,
+              -7.785240644173669
+            ],
+            [
+              110.84320676057804,
+              -7.785139312371259
+            ],
+            [
+              110.8431804802274,
+              -7.785031963177861
+            ],
+            [
+              110.84312994398437,
+              -7.784827293773056
+            ],
+            [
+              110.8430293776114,
+              -7.784416952066877
+            ],
+            [
+              110.84300102293659,
+              -7.784301089580312
+            ],
+            [
+              110.84299721479051,
+              -7.784231861943699
+            ],
+            [
+              110.84299010461146,
+              -7.784111458874598
+            ],
+            [
+              110.84297639036612,
+              -7.7838681454832965
+            ],
+            [
+              110.84298917297299,
+              -7.783871626382419
+            ],
+            [
+              110.84302295200482,
+              -7.783660698639164
+            ],
+            [
+              110.84305590740144,
+              -7.783464070448453
+            ],
+            [
+              110.84312025045625,
+              -7.783081687110581
+            ],
+            [
+              110.84324736882746,
+              -7.782315367135354
+            ],
+            [
+              110.84325213004897,
+              -7.782275892203781
+            ],
+            [
+              110.84320827623196,
+              -7.782248708234484
+            ],
+            [
+              110.84314085280528,
+              -7.782207960010183
+            ],
+            [
+              110.84313779087296,
+              -7.782227388448444
+            ],
+            [
+              110.84313221437031,
+              -7.782242166250704
+            ],
+            [
+              110.84312022317431,
+              -7.782274711549235
+            ],
+            [
+              110.84310903543178,
+              -7.782305661745347
+            ],
+            [
+              110.84309749040952,
+              -7.782335919214436
+            ],
+            [
+              110.84309466256599,
+              -7.782334286624106
+            ],
+            [
+              110.84301285264985,
+              -7.7822579518034445
+            ],
+            [
+              110.8429716124144,
+              -7.78221878782859
+            ],
+            [
+              110.8429530039556,
+              -7.782201697252159
+            ],
+            [
+              110.84294135279171,
+              -7.782190162270657
+            ],
+            [
+              110.8429112614437,
+              -7.782162848347866]
+        ]]
+      }
+    }
+  ]
+};
+
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW6baseng, {
+    style: function(feature) {
+      return {
+        color: "red",
+        weight: 2,
+        fillColor: "pink",
+        fillOpacity: 0.5
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT2RW6baseng, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "pink",
+    fillOpacity: 0.5
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Baseng RT 02/RW 06</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Perempuan </td>
+          <td> Laki-laki </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>82 Jiwa</td>
+          <td>96 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+// Bodeh RW 7 //
+
+var RT1RW7bodeh = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "07",
+        "nama": "RT 01 / RW 07"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+[
+              110.83232542240876,
+              -7.774782456324687
+            ],
+            [
+              110.83225998411115,
+              -7.776497229842889
+            ],
+            [
+              110.83166254521069,
+              -7.776500940619087
+            ],
+            [
+              110.83165954745243,
+              -7.776776761423065
+            ],
+            [
+              110.83156843350017,
+              -7.776900685067261
+            ],
+            [
+              110.8314482134515,
+              -7.7770559674142135
+            ],
+            [
+              110.831341039779,
+              -7.777181824943625
+            ],
+            [
+              110.83104642401167,
+              -7.777766828791016
+            ],
+            [
+              110.83108170461168,
+              -7.778070206398695
+            ],
+            [
+              110.8311899615803,
+              -7.778214413278874
+            ],
+            [
+              110.83110943382292,
+              -7.778298764864445
+            ],
+            [
+              110.8316336930352,
+              -7.778532890689917
+            ],
+            [
+              110.83180250597309,
+              -7.779083484010762
+            ],
+            [
+              110.83200100671013,
+              -7.779229501961989
+            ],
+            [
+              110.83223478355421,
+              -7.779349306318338
+            ],
+            [
+              110.83245406619534,
+              -7.779480771096701
+            ],
+            [
+              110.83271712208779,
+              -7.778912851853519
+            ],
+            [
+              110.83296378739627,
+              -7.77920039082273
+            ],
+            [
+              110.83325816035892,
+              -7.779364504886516
+            ],
+            [
+              110.83325077925534,
+              -7.779383147697537
+            ],
+            [
+              110.83365303582036,
+              -7.7792243384967605
+            ],
+            [
+              110.83395098335092,
+              -7.779107919818529
+            ],
+            [
+              110.83354598109852,
+              -7.777815131117812
+            ],
+            [
+              110.83300953138826,
+              -7.776595181532258
+            ],
+            [
+              110.8333505607178,
+              -7.776186041151135
+            ],
+            [
+              110.83369159064569,
+              -7.776152251762113
+            ],
+            [
+              110.8337973034059,
+              -7.774781814799809
+            ],
+            [
+              110.83347649107174,
+              -7.774787415344164
+            ],
+            [
+              110.83335816380703,
+              -7.774843410399079
+            ],
+            [
+              110.83321927764675,
+              -7.774867237441516
+            ],
+            [
+              110.83308039148645,
+              -7.774851454330971
+            ],
+            [
+              110.83254937807294,
+              -7.774802793435768
+            ],
+            [
+              110.83232542240876,
+              -7.774782456324687
+            ],
+            [
+              110.83254937807294,
+              -7.774802793435768
+            ],
+            [
+              110.83232542240876,
+              -7.774782456324687
+            ]
+        ]]
+      }
+    }
+  ]
+};
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW7bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW7bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 1/RW 7</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>127 Jiwa</td>
+          <td>129 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+var RT2RW7bodeh = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "07",
+        "nama": "RT 02 / RW 07"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[ [
+              110.83110899375168,
+              -7.778298718955824
+            ],
+            [
+              110.830785777908,
+              -7.778682071971609
+            ],
+            [
+              110.83074039184339,
+              -7.779461774037188
+            ],
+            [
+              110.8305835225932,
+              -7.779821118783971
+            ],
+            [
+              110.83035899561077,
+              -7.780137804872325
+            ],
+            [
+              110.82976102534994,
+              -7.780864924471153
+            ],
+            [
+              110.82942541840812,
+              -7.781256892191937
+            ],
+            [
+              110.82922077544009,
+              -7.781648859855963
+            ],
+            [
+              110.82886954004249,
+              -7.782060088720883
+            ],
+            [
+              110.82859182582041,
+              -7.782445191904813
+            ],
+            [
+              110.83006087524672,
+              -7.782811062674284
+            ],
+            [
+              110.83047259384858,
+              -7.782607099594415
+            ],
+            [
+              110.83095783362774,
+              -7.782607099594415
+            ],
+            [
+              110.83180523027141,
+              -7.782073444605203
+            ],
+            [
+              110.83173184777394,
+              -7.781947721638566
+            ],
+            [
+              110.83165712417048,
+              -7.78182266304951
+            ],
+            [
+              110.83162138549085,
+              -7.781267496634285
+            ],
+            [
+              110.83171521049928,
+              -7.78106491784537
+            ],
+            [
+              110.83176113559843,
+              -7.780965760764171
+            ],
+            [
+              110.83180658343733,
+              -7.780868022281245
+            ],
+            [
+              110.83189843363549,
+              -7.780668762379872
+            ],
+            [
+              110.83199123835692,
+              -7.780473285416948
+            ],
+            [
+              110.83208165677175,
+              -7.780276862717919
+            ],
+            [
+              110.83245391320906,
+              -7.77948003472352
+            ],
+            [
+              110.83223489856823,
+              -7.779349049448101
+            ],
+            [
+              110.83200045586489,
+              -7.779228921356008
+            ],
+            [
+              110.83180295316447,
+              -7.779085035340316
+            ],
+            [
+              110.8317223384563,
+              -7.778821679384116
+            ],
+            [
+              110.83163398414973,
+              -7.778533281287295
+            ],
+            [
+              110.83137178561537,
+              -7.778416156494039
+            ],
+            [
+              110.83110899375168,
+              -7.778298718955824
+            ]
+        ]]
+      }
+    }
+  ]
+};
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW7bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT2RW7bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 2/RW 7</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>64 Jiwa</td>
+          <td>61 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+//Bodeh RW 8//
+var RT1RW8bodeh = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "08",
+        "nama": "RT 01 / RW 08"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+[
+              110.83395235127438,
+              -7.779109138237217
+            ],
+            [
+              110.83326665999942,
+              -7.779377309134645
+            ],
+            [
+              110.83296359763068,
+              -7.779201571219538
+            ],
+            [
+              110.83271974649728,
+              -7.778913482522839
+            ],
+            [
+              110.83162310616007,
+              -7.781261955928954
+            ],
+            [
+              110.8316572107891,
+              -7.781822000865034
+            ],
+            [
+              110.83180519619737,
+              -7.78207175766687
+            ],
+            [
+              110.83182436833232,
+              -7.782783078957905
+            ],
+            [
+              110.8321756996495,
+              -7.782949851455342
+            ],
+            [
+              110.83265989187743,
+              -7.7829567789984395
+            ],
+            [
+              110.83293587578996,
+              -7.7826691512620485
+            ],
+            [
+              110.83324429346192,
+              -7.782451149362203
+            ],
+            [
+              110.83346330619352,
+              -7.782028655624472
+            ],
+            [
+              110.83366204782777,
+              -7.781647669581105
+            ],
+            [
+              110.83376095778226,
+              -7.7814802740745534
+            ],
+            [
+              110.83381391991594,
+              -7.781298149988615
+            ],
+            [
+              110.83377465049227,
+              -7.7805547762959435
+            ],
+            [
+              110.83383208086238,
+              -7.780302038715902
+            ],
+            [
+              110.83386346832981,
+              -7.780064039960621
+            ],
+            [
+              110.8339068607308,
+              -7.779722528248673
+            ],
+            [
+              110.8339135555789,
+              -7.77959917518033
+            ],
+            [
+              110.83395235127438,
+              -7.779109138237217
+            ]
+        ]]
+      }
+    }
+  ]
+};
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW8bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW8bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 1/RW 8</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>76 Jiwa</td>
+          <td>73 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+var RT2RW8bodeh = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "08",
+        "nama": "RT 02 / RW 08"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+             [
+              110.8339710337051,
+              -7.779106813143329
+            ],
+            [
+              110.83392000698811,
+              -7.779717262169349
+            ],
+            [
+              110.8338277428058,
+              -7.780333548038996
+            ],
+            [
+              110.83377763610326,
+              -7.780549875332753
+            ],
+            [
+              110.83385107423493,
+              -7.780649158739479
+            ],
+            [
+              110.83408765887373,
+              -7.781000768411062
+            ],
+            [
+              110.83454604161261,
+              -7.781513531986818
+            ],
+            [
+              110.83513750320833,
+              -7.7818065394644975
+            ],
+            [
+              110.83569136499949,
+              -7.7820970599994865
+            ],
+            [
+              110.8362343667539,
+              -7.782602780452692
+            ],
+            [
+              110.83625608682496,
+              -7.782979380393158
+            ],
+            [
+              110.8362995269656,
+              -7.7833990199284955
+            ],
+            [
+              110.83640812731676,
+              -7.78354965965967
+            ],
+            [
+              110.83640812731676,
+              -7.783786379126852
+            ],
+            [
+              110.83651672766655,
+              -7.783915498779663
+            ],
+            [
+              110.83687510882521,
+              -7.78406613832523
+            ],
+            [
+              110.83696707549348,
+              -7.784330882374078
+            ],
+            [
+              110.83700578257708,
+              -7.784329058274941
+            ],
+            [
+              110.83704150314703,
+              -7.784321321791692
+            ],
+            [
+              110.83711750295723,
+              -7.784302765625707
+            ],
+            [
+              110.83726980332045,
+              -7.784266649855418
+            ],
+            [
+              110.83757199935008,
+              -7.7841960066715075
+            ],
+            [
+              110.83734209033503,
+              -7.7836142195274505
+            ],
+            [
+              110.83712488963272,
+              -7.783409779911423
+            ],
+            [
+              110.8370382554969,
+              -7.783171851654998
+            ],
+            [
+              110.83709156209238,
+              -7.782997154139949
+            ],
+            [
+              110.83718177325716,
+              -7.782989028672034
+            ],
+            [
+              110.8371202656445,
+              -7.7826761980496
+            ],
+            [
+              110.83712846665964,
+              -7.782643696153158
+            ],
+            [
+              110.83726378340486,
+              -7.7825502531878215
+            ],
+            [
+              110.83733759253931,
+              -7.782269924164979
+            ],
+            [
+              110.8373908991349,
+              -7.78220898304906
+            ],
+            [
+              110.83737234063074,
+              -7.782084699842173
+            ],
+            [
+              110.83735038686052,
+              -7.782018970296484
+            ],
+            [
+              110.83732119050899,
+              -7.781985532211905
+            ],
+            [
+              110.83724401650045,
+              -7.781917158401271
+            ],
+            [
+              110.83718664575031,
+              -7.781824480152281
+            ],
+            [
+              110.83716057144386,
+              -7.781747324007384
+            ],
+            [
+              110.8372164709279,
+              -7.781591517939461
+            ],
+            [
+              110.83693436398295,
+              -7.781229725601378
+            ],
+            [
+              110.83693540838745,
+              -7.7812313412424245
+            ],
+            [
+              110.8368063552139,
+              -7.781104057198078
+            ],
+            [
+              110.83668542288177,
+              -7.780982164088101
+            ],
+            [
+              110.83643811480476,
+              -7.780740535175141
+            ],
+            [
+              110.83622610661331,
+              -7.780529400149774
+            ],
+            [
+              110.8360146807859,
+              -7.780394583327158
+            ],
+            [
+              110.83562144495465,
+              -7.780250058560739
+            ],
+            [
+              110.8355154218469,
+              -7.780144428214967
+            ],
+            [
+              110.83544097053664,
+              -7.779981089484423
+            ],
+            [
+              110.83540242790917,
+              -7.779896857268369
+            ],
+            [
+              110.83532523705054,
+              -7.779778647203628
+            ],
+            [
+              110.83531446499612,
+              -7.77976178363536
+            ],
+            [
+              110.83529745985153,
+              -7.779744758898108
+            ],
+            [
+              110.8352677657476,
+              -7.779714705553467
+            ],
+            [
+              110.83520871281519,
+              -7.779655263242958
+            ],
+            [
+              110.83508993639947,
+              -7.7795360464319
+            ],
+            [
+              110.83482774567216,
+              -7.779272643573762
+            ],
+            [
+              110.83458689018039,
+              -7.779139779800744
+            ],
+            [
+              110.83427608094453,
+              -7.779078087395284
+            ],
+            [
+              110.83409368071165,
+              -7.779081324853209
+            ],
+            [
+              110.8339710337051,
+              -7.779106813143329
+            ]
+        ]]
+      }
+    }
+  ]
+};
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW8bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT2RW8bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 2/RW 8</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>123 Jiwa</td>
+          <td>108 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+
+var RT3RW8bodeh = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "03",
+        "rw": "08",
+        "nama": "RT 03 / RW 08"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+ [
+              110.8376461097235,
+              -7.7841782187039
+            ],
+            [
+              110.83700549829626,
+              -7.7843292799637425
+            ],
+            [
+              110.83592725458391,
+              -7.784382140267255
+            ],
+            [
+              110.83532134004838,
+              -7.784840726127172
+            ],
+            [
+              110.8354391567633,
+              -7.785299311483897
+            ],
+            [
+              110.83567479462704,
+              -7.785466070236595
+            ],
+            [
+              110.83621886610854,
+              -7.785854196985412
+            ],
+            [
+              110.83714481026601,
+              -7.786371281272551
+            ],
+            [
+              110.83765828839057,
+              -7.7860126583678095
+            ],
+            [
+              110.83794448931252,
+              -7.78597929808177
+            ],
+            [
+              110.83837379069433,
+              -7.785537274042753
+            ],
+            [
+              110.83865449195298,
+              -7.785254857287612
+            ],
+            [
+              110.83848020246276,
+              -7.785083619760201
+            ],
+            [
+              110.83839429855395,
+              -7.785001381836814
+            ],
+            [
+              110.83831583964542,
+              -7.784900702950452
+            ],
+            [
+              110.83825009133983,
+              -7.784714678746042
+            ],
+            [
+              110.83817726617644,
+              -7.784616540728081
+            ],
+            [
+              110.83796650616807,
+              -7.78450530374279
+            ],
+            [
+              110.83777808116997,
+              -7.784405131337223
+            ],
+            [
+              110.83769793300519,
+              -7.784285107022093
+            ],
+            [
+              110.83766493652774,
+              -7.784218561587039
+            ],
+            [
+              110.8376461097235,
+              -7.7841782187039
+            ]
+        ]]
+      }
+    }
+  ]
+};
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT3RW8bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT3RW8bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 3/RW 8</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>32 Jiwa</td>
+          <td>33 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+
+
+//Bodeh Rw 9//
+var RT1RW9bodeh = {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "01",
+        "rw": "09",
+        "nama": "RT 01 / RW 09"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+           [
+              110.83300940712729,
+              -7.776591356596768
+            ],
+            [
+              110.83354500304256,
+              -7.777812251195954
+            ],
+            [
+              110.83398679246608,
+              -7.77912600913551
+            ],
+            [
+              110.83423432153387,
+              -7.779085544521109
+            ],
+            [
+              110.83458814678681,
+              -7.779138373909603
+            ],
+            [
+              110.83482372408156,
+              -7.779268690685498
+            ],
+            [
+              110.83531430914985,
+              -7.779761511524654
+            ],
+            [
+              110.83540288600949,
+              -7.779898217134843
+            ],
+            [
+              110.83551531175397,
+              -7.780142939516892
+            ],
+            [
+              110.83562092381703,
+              -7.780249267128738
+            ],
+            [
+              110.83601611734298,
+              -7.7803944127122975
+            ],
+            [
+              110.83622585639642,
+              -7.78052965218167
+            ],
+            [
+              110.83693618148106,
+              -7.781231749801975
+            ],
+            [
+              110.83788041185989,
+              -7.7802133816148284
+            ],
+            [
+              110.83814784838302,
+              -7.77987245840373
+            ],
+            [
+              110.83729102853039,
+              -7.778976267263985
+            ],
+            [
+              110.83687709766957,
+              -7.778282602805888
+            ],
+            [
+              110.83603390633544,
+              -7.777236195236654
+            ],
+            [
+              110.83417965683697,
+              -7.776377013149528
+            ],
+            [
+              110.83385941389258,
+              -7.776162666769139
+            ],
+            [
+              110.83369077527658,
+              -7.7761491647204934
+            ],
+            [
+              110.83335179462227,
+              -7.776182919841233
+            ],
+            [
+              110.83300940712729,
+              -7.776591356596768
+            ]
+        ]]
+      }
+    }
+  ]
+};
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT1RW9bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT1RW9bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 1/RW 9</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>57 Jiwa</td>
+          <td>40 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+var RT2RW9bodeh= {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "02",
+        "rw": "09",
+        "nama": "RT 02 / RW 09"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+           [
+              110.83839460086278,
+              -7.785002233687635
+            ],
+            [
+              110.83852859741846,
+              -7.7851311558956215
+            ],
+            [
+              110.83865415852316,
+              -7.785254506300195
+            ],
+            [
+              110.83839844733536,
+              -7.785512555568891
+            ],
+            [
+              110.8383525916916,
+              -7.785558736691344
+            ],
+            [
+              110.83830569956274,
+              -7.785607827444322
+            ],
+            [
+              110.83821571574379,
+              -7.78570018968613
+            ],
+            [
+              110.83794437929271,
+              -7.785979295252921
+            ],
+            [
+              110.83765809544543,
+              -7.78601295639835
+            ],
+            [
+              110.83754015138328,
+              -7.786094928966819
+            ],
+            [
+              110.83748168226752,
+              -7.786135915250968
+            ],
+            [
+              110.83742120149279,
+              -7.78617823027594
+            ],
+            [
+              110.83714471026983,
+              -7.786371299204001
+            ],
+            [
+              110.83639661513126,
+              -7.7865003823767625
+            ],
+            [
+              110.83640282187261,
+              -7.786993927957152
+            ],
+            [
+              110.83695485106097,
+              -7.788017050902276
+            ],
+            [
+              110.83779160723022,
+              -7.78860837661245
+            ],
+            [
+              110.8384616349226,
+              -7.788708330829369
+            ],
+            [
+              110.83862046146123,
+              -7.788675852813839
+            ],
+            [
+              110.83926309596353,
+              -7.788616456595335
+            ],
+            [
+              110.83941804855829,
+              -7.788515750203743
+            ],
+            [
+              110.84024446250845,
+              -7.7885068798405825
+            ],
+            [
+              110.8406793037467,
+              -7.7885023352952345
+            ],
+            [
+              110.84114513038008,
+              -7.788292820650142
+            ],
+            [
+              110.84117198302351,
+              -7.788186456453602
+            ],
+            [
+              110.84120080381479,
+              -7.7881007905371575
+            ],
+            [
+              110.8411693624675,
+              -7.787945033849525
+            ],
+            [
+              110.84108813899104,
+              -7.787807448727818
+            ],
+            [
+              110.84084970878195,
+              -7.787594581090673
+            ],
+            [
+              110.84068464171605,
+              -7.787431036369725
+            ],
+            [
+              110.84043049359997,
+              -7.787158462776858
+            ],
+            [
+              110.84014752148602,
+              -7.786787241740555
+            ],
+            [
+              110.84016586227176,
+              -7.786582161447072
+            ],
+            [
+              110.84014228126182,
+              -7.7864134244216245
+            ],
+            [
+              110.84012656047162,
+              -7.786270646485647
+            ],
+            [
+              110.84004795710632,
+              -7.786029222540847
+            ],
+            [
+              110.83913353636183,
+              -7.7850765035480265
+            ],
+            [
+              110.83903397209957,
+              -7.784848058738376
+            ],
+            [
+              110.83885056424782,
+              -7.7847000887376225
+            ],
+            [
+              110.83839460086278,
+              -7.785002233687635
+            ] 
+        ]]
+      }
+    }
+  ]
+};
+
+
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT2RW9bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT2RW9bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 2/RW 9</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>37 Jiwa</td>
+          <td>35 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+
+  var RT3RW9bodeh= {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "03",
+        "rw": "09",
+        "nama": "RT 03 / RW 09"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [
+              110.83549809019974,
+              -7.781997094977513
+            ],
+            [
+              110.83538546136141,
+              -7.78193735575776
+            ],
+            [
+              110.83526744454528,
+              -7.7818760167396555
+            ],
+            [
+              110.83503249581503,
+              -7.781754085816111
+            ],
+            [
+              110.83454538604326,
+              -7.781515340110914
+            ],
+            [
+              110.83408750294365,
+              -7.781000861234595
+            ],
+            [
+              110.83393406890684,
+              -7.78077235707779
+            ],
+            [
+              110.83385113468839,
+              -7.780649789051607
+            ],
+            [
+              110.83377509739768,
+              -7.780554729460292
+            ],
+            [
+              110.83379694186024,
+              -7.780975624277751
+            ],
+            [
+              110.8338118568546,
+              -7.781302979622964
+            ],
+            [
+              110.83377940059759,
+              -7.781420878487744
+            ],
+            [
+              110.8337612799088,
+              -7.781478890352812
+            ],
+            [
+              110.83373369641295,
+              -7.781526588982501
+            ],
+            [
+              110.83367453990914,
+              -7.781627147186093
+            ],
+            [
+              110.8336474381806,
+              -7.7816755153400585
+            ],
+            [
+              110.83362436948894,
+              -7.78172013733969
+            ],
+            [
+              110.8334082502305,
+              -7.782133180955057
+            ],
+            [
+              110.8332460347948,
+              -7.782450078759098
+            ],
+            [
+              110.83301461697607,
+              -7.782617861565981
+            ],
+            [
+              110.83312122921927,
+              -7.782694063370656
+            ],
+            [
+              110.83337884759618,
+              -7.7830490138544235
+            ],
+            [
+              110.83361634056735,
+              -7.783240447858674
+            ],
+            [
+              110.83419396927252,
+              -7.783364082169669
+            ],
+            [
+              110.83480173670785,
+              -7.783590385837655
+            ],
+            [
+              110.83481582521324,
+              -7.783361064227066
+            ],
+            [
+              110.83523107656725,
+              -7.782754180311102
+            ],
+            [
+              110.8353498225373,
+              -7.782305506581167
+            ],
+            [
+              110.83546679185491,
+              -7.782116069016752
+            ],
+            [
+              110.83549809019974,
+              -7.781997094977513
+            ]  
+        ]]
+      }
+    }
+  ]
+};
+
+
+ // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT3RW9bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT3RW9bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 3/RW 9</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td>46 Jiwa</td>
+          <td>35 Jiwa</td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+
+   var RT4RW9bodeh= {
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "rt": "04",
+        "rw": "09",
+        "nama": "RT 04 / RW 09"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+           [
+              110.83789782127587,
+              -7.78019174494014
+            ],
+            [
+              110.83788112622541,
+              -7.78021259753519
+            ],
+            [
+              110.83784079420874,
+              -7.780256039035948
+            ],
+            [
+              110.83777991146542,
+              -7.780321994080525
+            ],
+            [
+              110.83765948708462,
+              -7.780452243220044
+            ],
+            [
+              110.83741930887405,
+              -7.7807100839835
+            ],
+            [
+              110.83693526441459,
+              -7.781229087406189
+            ],
+            [
+              110.83719665272122,
+              -7.781562994329207
+            ],
+            [
+              110.83721967690533,
+              -7.781600346459673
+            ],
+            [
+              110.83716494416723,
+              -7.7817477569938305
+            ],
+            [
+              110.83719158346837,
+              -7.781836394221445
+            ],
+            [
+              110.83724752808851,
+              -7.781919752278252
+            ],
+            [
+              110.8373407703884,
+              -7.782000470764123
+            ],
+            [
+              110.83738073123712,
+              -7.782106819612433
+            ],
+            [
+              110.83738872264803,
+              -7.782213168460743
+            ],
+            [
+              110.83733698922812,
+              -7.782270878649955
+            ],
+            [
+              110.83731456112739,
+              -7.782366862780481
+            ],
+            [
+              110.83726304462459,
+              -7.782549592463745
+            ],
+            [
+              110.83712990364666,
+              -7.7826431749777925
+            ],
+            [
+              110.83712051514979,
+              -7.782677127077801
+            ],
+            [
+              110.8371310362224,
+              -7.782730538614979
+            ],
+            [
+              110.8371476743396,
+              -7.782815171104279
+            ],
+            [
+              110.83718262649063,
+              -7.782989890243989
+            ],
+            [
+              110.83709150823935,
+              -7.7829974904586585
+            ],
+            [
+              110.83703912819504,
+              -7.783169746669756
+            ],
+            [
+              110.83712507321977,
+              -7.783410379521889
+            ],
+            [
+              110.83720908133313,
+              -7.783489043228499
+            ],
+            [
+              110.83734383647885,
+              -7.783615479067478
+            ],
+            [
+              110.83738300647218,
+              -7.7837172657926175
+            ],
+            [
+              110.8375529445969,
+              -7.784148506632654
+            ],
+            [
+              110.83757168428355,
+              -7.784195874779499
+            ],
+            [
+              110.83764755798757,
+              -7.784178511155531
+            ],
+            [
+              110.8376970017809,
+              -7.784284090255241
+            ],
+            [
+              110.83778084345238,
+              -7.784407879443393
+            ],
+            [
+              110.83817868156541,
+              -7.784616367365729
+            ],
+            [
+              110.83824772764751,
+              -7.784712466795185
+            ],
+            [
+              110.83831677309416,
+              -7.784901408116355
+            ],
+            [
+              110.83839568290335,
+              -7.785000765085542
+            ],
+            [
+              110.83885140774589,
+              -7.784697690852184
+            ],
+            [
+              110.8381247800342,
+              -7.784204162642581
+            ],
+            [
+              110.83810505258128,
+              -7.784062456524836
+            ],
+            [
+              110.83810176467267,
+              -7.783948440074454
+            ],
+            [
+              110.83838945651428,
+              -7.783391388540963
+            ],
+            [
+              110.83850298377627,
+              -7.783103183742284
+            ],
+            [
+              110.83857531776698,
+              -7.782863748612414
+            ],
+            [
+              110.8385950452186,
+              -7.782676435320255
+            ],
+            [
+              110.83854587003418,
+              -7.782189374288123
+            ],
+            [
+              110.83844422217749,
+              -7.781787869913785
+            ],
+            [
+              110.83845079799471,
+              -7.781611957851609
+            ],
+            [
+              110.83850011662514,
+              -7.781465364409442
+            ],
+            [
+              110.83860041585467,
+              -7.781309069534089
+            ],
+            [
+              110.83874015197381,
+              -7.7811722488905986
+            ],
+            [
+              110.83893413853548,
+              -7.78105334493668
+            ],
+            [
+              110.83906236697504,
+              -7.781022397395418
+            ],
+            [
+              110.83922347450084,
+              -7.781024026212805
+            ],
+            [
+              110.83789782127587,
+              -7.78019174494014
+            ]  
+        ]]
+      }
+    }
+  ]
+};
+
+  // --- Tambahkan layer RT/RW ---
+  var rtLayer = L.geoJSON(RT4RW9bodeh, {
+    style: function(feature) {
+      return {
+        color: "blue",
+        weight: 2,
+        fillColor: "cyan",
+        fillOpacity: 0.3
+      };
+    },
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(`
+        <b>${feature.properties.nama}</b><br>
+        RT: ${feature.properties.rt}<br>
+        RW: ${feature.properties.rw}
+      `);
+    }
+  }).addTo(map);
+
+  var polygonLayer = L.geoJSON(RT4RW9bodeh, {
+  style: {
+    color: "red",
+    weight: 2,
+    fillColor: "blue",
+    fillOpacity: 0.3
+  },
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(`
+      <b>Informasi Dusun Bodeh RT 4/RW 9</b><br>
+      <table border="1" cellspacing="0" cellpadding="5">
+        <tr>
+          <td><b>Jenis Kelamin</b></td>
+          <td> Laki-laki </td>
+          <td> Perempuan </td>
+        </tr>
+        <tr>
+          <td><b>Jumlah Penduduk</b></td>
+          <td> 29 Jiwa </td>
+          <td> 29 Jiwa </td>
+        </tr>
+      </table>
+    `);
+    addLabelToPolygon(feature, layer);
+
+  }
+}).addTo(map);
+
+
+  // --- Layer Control ---
+  var baseMaps = {
+    "OpenStreetMap": basemapOSM,
+    "Esri Satelit": basemapEsri
+  };
+
+  var overlayMaps = {
+    "Balai Desa Gentan": marker,
+    "Wisata Sendang Lele": markerSendangLele,
+    "Wisata Batu Seribu": markerBatuSeribu,
+    "Wisata Miri Kerep": markerMirikerep,
+    "Wisata Platar Ombo": markerPlatarOmbo,
+    "Wisata Embung Gentan": markerEmbungGentan,
+    "Batas Gentan": batasgentanlayer
+
+  };
+
+  L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+
+
+</script>
+</body>
+</html>
